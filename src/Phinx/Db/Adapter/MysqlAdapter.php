@@ -183,13 +183,18 @@ class MysqlAdapter extends PdoAdapter implements AdapterInterface
      */
     public function hasTable($tableName)
     {
-        $options = $this->getOptions();
+        if (strpos($tableName, '.') !== false) {
+            list($schema, $tableName) = explode('.', $tableName);
+        } else {
+            $options = $this->getOptions();
+            $schema = $options['name'];
+        }
 
         $exists = $this->fetchRow(sprintf(
             "SELECT TABLE_NAME
             FROM INFORMATION_SCHEMA.TABLES
             WHERE TABLE_SCHEMA = '%s' AND TABLE_NAME = '%s'",
-            $options['name'],
+            $schema,
             $tableName
         ));
 
